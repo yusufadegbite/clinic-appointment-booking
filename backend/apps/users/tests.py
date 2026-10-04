@@ -48,12 +48,30 @@ class TestRegister:
         assert 'password_confirm' in response.data
 
     def test_rejects_duplicate_email(self, api_client, registration_payload, user, db):
-        registration_payload['email'] = user.email
+        registration_payload['email'] = user.email.upper()
 
         response = api_client.post(REGISTER_URL, registration_payload)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert 'email' in response.data
+        assert response.data['email'][0] == 'That email is already registered'
+
+    def test_name_is_optional(self, api_client, registration_payload, db):
+        registration_payload.pop('first_name')
+
+        response = api_client.post(REGISTER_URL, registration_payload)
+
+        assert response.status_code == status.HTTP_201_CREATED
+
+    def test_weak_password_explains_what_is_wrong(self, api_client, registration_payload, db):
+        registration_payload['password'] = 'short'
+        registration_payload['password_confirm'] = 'short'
+
+        response = api_client.post(REGISTER_URL, registration_payload)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert 'password' in response.data
+        assert 'too short' in str(response.data['password']).lower()
 
 
 class TestLogin:
