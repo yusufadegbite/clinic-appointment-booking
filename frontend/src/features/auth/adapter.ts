@@ -37,6 +37,14 @@ function mapDjangoUser(data: any): AuthUser {
 
 function toAuthError(error: unknown): AuthError {
   const parsed = parseApiError(error)
+  const emailErrors = parsed.fieldErrors.email ?? []
+
+  if (emailErrors.some((message) => /already (exists|registered)/i.test(message))) {
+    return {
+      code: `auth/${parsed.status || 'error'}`,
+      message: 'That email is already registered',
+    }
+  }
 
   // If there are field-level errors, include them in the message
   const fieldMessages = Object.entries(parsed.fieldErrors)

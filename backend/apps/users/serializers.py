@@ -36,6 +36,8 @@ class LoginSerializer(serializers.Serializer):
 class RegisterSerializer(serializers.ModelSerializer):
     """Serializer for user registration."""
 
+    email = serializers.EmailField(validators=[])
+    first_name = serializers.CharField(required=False, allow_blank=True)
     password = serializers.CharField(
         write_only=True,
         validators=[validate_password],
@@ -45,6 +47,11 @@ class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['email', 'first_name', 'last_name', 'password', 'password_confirm']
+
+    def validate_email(self, value):
+        if CustomUser.objects.filter(email__iexact=value).exists():
+            raise serializers.ValidationError('That email is already registered')
+        return value
 
     def validate(self, attrs):
         if attrs['password'] != attrs.pop('password_confirm'):

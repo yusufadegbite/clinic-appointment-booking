@@ -2,7 +2,7 @@ import { Path, buildPath } from '../paths'
 
 describe('buildPath', () => {
   it('returns a static path unchanged', () => {
-    expect(buildPath(Path.Dashboard)).toBe('/dashboard')
+    expect(buildPath(Path.Home)).toBe('/')
   })
 
   it('substitutes a named parameter', () => {

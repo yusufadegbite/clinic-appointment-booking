@@ -13,7 +13,6 @@ export enum Path {
   Register = '/register',
   ForgotPassword = '/forgot-password',
   ResetPassword = '/reset-password/:token',
-  Dashboard = '/dashboard',
   // blacksmith:path
 }
 
